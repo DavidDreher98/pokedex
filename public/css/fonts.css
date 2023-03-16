@@ -1,0 +1,47 @@
+@font-face {
+    font-family: 'Flexo-Black';
+    src: url('../../fonts/Flexo-Black.ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Flexo-Bold';
+    src: url('../../fonts/Flexo-Bold.ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Flexo-Thin';
+    src: url('../../fonts/Flexo-Thin.ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Flexo-SemiBold';
+    src: url('../../fonts/Flexo-SemiBold.ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Flexo-Regular';
+    src: url('../../fonts/Flexo-Regular.ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Flexo-Medium';
+    src: url('../../fonts/Flexo-Medium.ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Flexo-Light';
+    src: url('../../fonts/Flexo-Light.ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Flexo-ExtraLight';
+    src: url('../../fonts/Flexo-ExtraLight.ttf');
+    font-display: swap;
+}

@@ -1,0 +1,8 @@
+app/.git
+app/.idea
+app/.env
+app/node_modules
+app/vendor
+app/storage/framework/cache/**
+app/storage/framework/sessions/**
+app/storage/framework/views/**

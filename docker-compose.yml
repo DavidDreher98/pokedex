@@ -1,0 +1,43 @@
+version: '3.7'
+services:
+  #PHP Service
+  pokelist:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: pokelist-app
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    tty: true
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+      - ./.docker-compose/php/php.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - pokelist
+  nginx:
+    depends_on:
+      - pokelist
+    image: nginx:alpine
+    container_name: pokelist-nginx
+    restart: always
+    tty: true
+    volumes:
+      - ./:/var/www
+      - ./.docker-compose/nginx/conf.d:/etc/nginx/conf.d
+    command: [nginx, '-g', 'daemon off;']
+    ports:
+      - "80:80"
+    networks:
+      - pokelist
+#Docker Networks
+networks:
+  pokelist:
+    driver: bridge
+volumes:
+  dbdata:
+    driver: local
