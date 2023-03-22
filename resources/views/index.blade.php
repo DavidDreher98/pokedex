@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('tituloPagina') PokeList @endsection
+@section('tituloPagina') Pokédex @endsection
 @section('conteudo')
     <section class="container">
         <pokedex-component/>
