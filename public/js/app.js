@@ -19395,28 +19395,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
-      urlApi: 'https://pokeapi.co/api/v2/',
+      types: [],
       pokedex: [],
       pokedexFiltered: [],
+      orderBy: 0,
       filterActive: 0,
       filter: null,
       filterType: [],
       timeInterval: 300,
       intervalKey: null,
-      nextPage: null,
-      observer: null,
-      carregando: "1",
-      types: []
+      carregando: false
     };
   },
   created: function created() {
     this.getTypes();
     this.getPokedex();
-    document.addEventListener('scroll', function (e) {
-      if (document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight) this.getPokedex("next");
-    }.bind(this));
   },
   methods: {
+    // API
     getTypes: function getTypes() {
       var _this = this;
 
@@ -19425,7 +19421,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                axios.get(_this.urlApi + "type").then(function (response) {
+                axios.get("https://pokeapi.co/api/v2/type").then(function (response) {
                   if (response && response.status == 200) {
                     _this.types = response.data.results;
                   }
@@ -19440,32 +19436,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     getPokedex: function getPokedex() {
-      var _arguments = arguments,
-          _this2 = this;
+      var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
-        var current, url;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                current = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : "begin";
-                _this2.carregando = "1";
-                url = _this2.urlApi + 'pokemon?offset=0&limit=12';
-
-                if (current == "next") {
-                  url = _this2.nextPage;
-                }
-
-                axios.get(url).then(function (response) {
+                _this2.carregando = true;
+                axios.get("https://pokeapi.co/api/v2/pokemon?offset=0&limit=50").then(function (response) {
                   if (response && response.status == 200) {
-                    _this2.nextPage = response.data.next;
-
                     _this2.getDetails(response.data.results);
                   }
                 });
 
-              case 5:
+              case 2:
               case "end":
                 return _context2.stop();
             }
@@ -19483,15 +19468,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context3.prev = _context3.next) {
               case 0:
                 pokemonRequests = results.map(function (pokemon) {
-                  if (!pokemon.url) {
-                    pokemon = pokemon.pokemon;
-                  }
-
                   if (_this3.pokedex.findIndex(function (item) {
                     return item.name.toLowerCase() == pokemon.name;
-                  }) == -1) {
-                    return axios.get(pokemon.url);
-                  }
+                  }) == -1) return axios.get(pokemon.url);
                 });
                 _context3.next = 3;
                 return Promise.all(pokemonRequests);
@@ -19499,22 +19478,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 3:
                 pokemonResponses = _context3.sent;
                 pokemonResponses.forEach(function (response) {
-                  if (response && response.status == 200) {
-                    _this3.pushArray(response.data, response.config.url);
-                  }
+                  if (response && response.status == 200) _this3.pushArray(response.data);
                 });
+                _this3.carregando = false;
 
-                if (_this3.filterType.length > 0) {
-                  _this3.pokedexFiltered = _this3.pokedexFiltered.filter(function (item) {
-                    return item.types.findIndex(function (type) {
-                      return _this3.filterType.includes(type.type.name);
-                    }) != -1;
-                  });
-                }
-
-                _this3.carregando = "0";
-
-              case 7:
+              case 6:
               case "end":
                 return _context3.stop();
             }
@@ -19522,17 +19490,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee3);
       }))();
     },
-    pushArray: function pushArray(pokemon, url) {
-      pokemon.name = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
-      pokemon.image = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/".concat(pokemon.id, ".png");
-      this.pokedex.push(pokemon);
-      this.pokedexFiltered.push(pokemon);
-    },
-    assetPath: function assetPath(path) {
-      return window.location.origin + path;
-    },
     // Filters
-    filterByType: function filterByType(type, url) {
+    filterAll: function filterAll() {
       var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
@@ -19540,18 +19499,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                _this4.carregando = "1";
-                _this4.pokedexFiltered = [];
+                _this4.carregando = true;
+                _context4.next = 3;
+                return _this4.pokedex.filter(function (item) {
+                  var isTrueFilter = true;
+                  var isTrueFilterType = true;
 
-                _this4.filterType.push(type);
+                  if (_this4.filter && _this4.filter.trim().length > 0) {
+                    var onlyNumber = _this4.filter.replace(/[^0-9]/g, '');
 
-                console.log("this.filterType");
-                console.log(_this4.filterType);
-                axios.get(url).then(function (response) {
-                  if (response && response.status == 200) {
-                    _this4.getDetails(response.data.pokemon);
+                    if (onlyNumber > 0) isTrueFilter = item.id == onlyNumber;else isTrueFilter = item.name.toLowerCase().indexOf(_this4.filter.trim().toLowerCase()) !== -1;
                   }
+
+                  if (_this4.filterType.length > 0) isTrueFilterType = item.types.findIndex(function (type) {
+                    return _this4.filterType.includes(type.type.name);
+                  }) != -1;
+                  return isTrueFilter && isTrueFilterType;
                 });
+
+              case 3:
+                _this4.pokedexFiltered = _context4.sent;
+
+                _this4.sortBy();
+
+                _this4.carregando = false;
 
               case 6:
               case "end":
@@ -19560,6 +19531,49 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           }
         }, _callee4);
       }))();
+    },
+    filterByType: function filterByType(type) {
+      if (this.filterType.length > 0) {
+        if (this.filterType.includes(type)) {
+          this.filterType = this.filterType.filter(function (c) {
+            return c != type;
+          });
+        } else {
+          this.filterType.push(type);
+        }
+      } else {
+        this.filterType.push(type);
+      }
+
+      this.filterAll();
+    },
+    resetFilters: function resetFilters() {
+      this.filter = null;
+      this.filterType = [];
+      this.orderBy = 0;
+      this.filterAll();
+    },
+    // Sort By
+    sortBy: function sortBy() {
+      if (this.orderBy == 0) this.pokedexFiltered.sort(function (a, b) {
+        return a.id - b.id;
+      });else if (this.orderBy == 1) this.pokedexFiltered.sort(function (a, b) {
+        return b.id - a.id;
+      });else if (this.orderBy == 2) this.pokedexFiltered.sort(function (a, b) {
+        return a.name.localeCompare(b.name);
+      });else if (this.orderBy == 3) this.pokedexFiltered.sort(function (a, b) {
+        return b.name.localeCompare(a.name);
+      });
+    },
+    // Others
+    pushArray: function pushArray(pokemon) {
+      pokemon.name = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
+      pokemon.image = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/".concat(pokemon.id, ".png");
+      this.pokedex.push(pokemon);
+      this.pokedexFiltered.push(pokemon);
+    },
+    assetPath: function assetPath(path) {
+      return window.location.origin + path;
     }
   },
   watch: {
@@ -19568,8 +19582,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       clearTimeout(this.intervalKey);
       this.intervalKey = setTimeout(function () {
-        _this5.loadingData();
+        _this5.filterAll();
       }, this.timeInterval);
+    },
+    orderBy: function orderBy() {
+      this.sortBy();
     }
   }
 });
@@ -19672,7 +19689,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 var _hoisted_1 = {
-  "class": "flex-jb flex-ac mt-2"
+  "class": "flex-w flex-jb flex-ac mt-2"
 };
 
 var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h1", null, "Pokédex", -1
@@ -19706,27 +19723,89 @@ var _hoisted_7 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVN
 
 var _hoisted_8 = [_hoisted_7];
 
-var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Filter by type:", -1
+var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Sort by:", -1
 /* HOISTED */
 );
 
 var _hoisted_10 = {
+  "class": "ul-orderby"
+};
+var _hoisted_11 = {
+  "for": "orderBy0-1000"
+};
+
+var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "0-1000", -1
+/* HOISTED */
+);
+
+var _hoisted_13 = {
+  "for": "orderBy1000-0"
+};
+
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "1000-0", -1
+/* HOISTED */
+);
+
+var _hoisted_15 = {
+  "for": "orderByA-Z"
+};
+
+var _hoisted_16 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "A-Z", -1
+/* HOISTED */
+);
+
+var _hoisted_17 = {
+  "for": "orderByZ-A"
+};
+
+var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Z-A", -1
+/* HOISTED */
+);
+
+var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Filter by type:", -1
+/* HOISTED */
+);
+
+var _hoisted_20 = {
   "class": "ul-types"
 };
-var _hoisted_11 = ["data-type", "data-filter", "onClick"];
-var _hoisted_12 = ["src", "alt"];
-var _hoisted_13 = {
+var _hoisted_21 = ["data-type", "data-filter", "onClick"];
+var _hoisted_22 = ["src", "alt"];
+var _hoisted_23 = {
+  "class": "mt-2 flex-jc"
+};
+
+var _hoisted_24 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+  viewBox: "0 0 512.000000 512.000000"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("g", {
+  transform: "translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  d: "M2510 4919 c-318 -39 -547 -106 -815 -239 -256 -126 -421 -245 -631 -455 -166 -166 -320 -377 -419 -574 -20 -40 -40 -70 -44 -65 -4 5 -65 129 -136 275 l-128 267 -152 -73 c-84 -40 -160 -77 -169 -82 -13 -7 25 -93 259 -578 174 -362 280 -570 289 -570 24 0 1136 539 1136 551 0 15 -149 318 -158 322 -5 1 -138 -60 -298 -137 -159 -76 -291 -137 -293 -135 -8 7 136 245 203 334 245 328 592 575 983 700 284 91 659 119 937 69 868 -154 1519 -820 1651 -1690 22 -138 22 -420 0 -558 -91 -597 -425 -1105 -936 -1422 -205 -127 -460 -223 -714 -268 -210 -38 -495 -32 -722 14 -450 91 -876 349 -1153 699 -51 65 -88 102 -95 98 -6 -4 -75 -52 -152 -107 l-141 -99 31 -45 c66 -92 219 -261 309 -341 179 -160 348 -274 553 -375 222 -109 453 -182 705 -221 161 -26 519 -26 680 -1 145 23 349 75 476 122 232 85 509 245 692 398 98 83 265 252 337 342 209 260 368 578 450 899 54 215 69 342 69 586 0 244 -15 371 -69 586 -82 321 -241 639 -450 899 -72 90 -239 259 -337 342 -183 153 -460 313 -692 398 -124 46 -329 99 -466 120 -124 19 -480 28 -590 14z"
+})])], -1
+/* HOISTED */
+);
+
+var _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Reset filters ");
+
+var _hoisted_26 = [_hoisted_24, _hoisted_25];
+var _hoisted_27 = {
   "class": "pokedex-list"
 };
-var _hoisted_14 = {
+var _hoisted_28 = {
   "class": "card-figure-pokedex"
 };
-var _hoisted_15 = ["src"];
-var _hoisted_16 = {
+var _hoisted_29 = ["src"];
+var _hoisted_30 = {
   "class": "ul-types"
 };
-var _hoisted_17 = ["data-type"];
-var _hoisted_18 = ["src"];
+var _hoisted_31 = ["data-type"];
+var _hoisted_32 = ["src"];
+var _hoisted_33 = {
+  "class": "notResults"
+};
+
+var _hoisted_34 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Sorry, we couldn't find any pokemon with ");
+
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_status_component = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("status-component");
 
@@ -19748,7 +19827,47 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[1] || (_cache[1] = function ($event) {
       return $data.filterActive = $data.filterActive == 1 ? 0 : 1;
     })
-  }, _hoisted_8), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("article", null, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_10, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.types, function (type) {
+  }, _hoisted_8), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("article", null, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "radio",
+    id: "orderBy0-1000",
+    name: "orderBy",
+    value: "0",
+    "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+      return $data.orderBy = $event;
+    })
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.orderBy]]), _hoisted_12])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "radio",
+    id: "orderBy1000-0",
+    name: "orderBy",
+    value: "1",
+    "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
+      return $data.orderBy = $event;
+    })
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.orderBy]]), _hoisted_14])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "radio",
+    id: "orderByA-Z",
+    name: "orderBy",
+    value: "2",
+    "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
+      return $data.orderBy = $event;
+    })
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.orderBy]]), _hoisted_16])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "radio",
+    id: "orderByZ-A",
+    name: "orderBy",
+    value: "3",
+    "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
+      return $data.orderBy = $event;
+    })
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.orderBy]]), _hoisted_18])])]), _hoisted_19, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_20, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.types, function (type) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: type.name
     }, [!['unknown', 'shadow'].includes(type.name) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
@@ -19756,37 +19875,43 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "data-type": type.name,
       "data-filter": $data.filterType.length == 0 || $data.filterType.includes(type.name),
       onClick: function onClick($event) {
-        return $options.filterByType(type.name, type.url);
+        return $options.filterByType(type.name);
       }
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
       src: $options.assetPath('/img/types/' + type.name + '.svg'),
       alt: type.name
     }, null, 8
     /* PROPS */
-    , _hoisted_12), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(type.name), 1
+    , _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(type.name), 1
     /* TEXT */
     )], 8
     /* PROPS */
-    , _hoisted_11)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64
+    , _hoisted_21)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64
     /* STABLE_FRAGMENT */
     );
   }), 128
   /* KEYED_FRAGMENT */
-  ))])])], 8
+  ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    href: "Javascript:;",
+    "class": "reset",
+    onClick: _cache[6] || (_cache[6] = function ($event) {
+      return $options.resetFilters();
+    })
+  }, _hoisted_26)])])], 8
   /* PROPS */
-  , _hoisted_6)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.pokedexFiltered, function (pokemon) {
+  , _hoisted_6)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.pokedexFiltered, function (pokemon) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
       key: pokemon
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("aside", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(pokemon.id), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("figure", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("figure", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
       src: pokemon.image,
       alt: "Image pokemon"
     }, null, 8
     /* PROPS */
-    , _hoisted_15)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(pokemon.id) + " • " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(pokemon.name), 1
+    , _hoisted_29)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(pokemon.id) + " • " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(pokemon.name), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_16, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(pokemon.types, function (type) {
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_30, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(pokemon.types, function (type) {
       return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
         key: type,
         "data-type": type.type.name
@@ -19795,17 +19920,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         alt: ""
       }, null, 8
       /* PROPS */
-      , _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(type.type.name), 1
+      , _hoisted_32), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(type.type.name), 1
       /* TEXT */
       )], 8
       /* PROPS */
-      , _hoisted_17);
+      , _hoisted_31);
     }), 128
     /* KEYED_FRAGMENT */
     ))])])]);
   }), 128
   /* KEYED_FRAGMENT */
-  ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_status_component, {
+  ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [_hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "\"" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.filter) + "\"", 1
+  /* TEXT */
+  )])], 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.pokedexFiltered.length == 0 && $data.carregando == false && $data.filter != null && $data.filter.trim().length > 0]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_status_component, {
     carregando: $data.carregando
   }, null, 8
   /* PROPS */

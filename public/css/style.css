@@ -529,121 +529,6 @@ body::-webkit-scrollbar-thumb {
 .h-100 {
     height: 100%;
 }
-.gap-025{
-    row-gap: .25rem;
-    -moz-column-gap: .25rem;
-         column-gap: .25rem;
-}
-.gap-05{
-    row-gap: .5rem;
-    -moz-column-gap: .5rem;
-         column-gap: .5rem;
-}
-.gap-1{
-    row-gap: 1rem;
-    -moz-column-gap: 1rem;
-         column-gap: 1rem;
-}
-.gap-2{
-    row-gap: 2rem;
-    -moz-column-gap: 2rem;
-         column-gap: 2rem;
-}
-.gap-3{
-    row-gap: 3rem;
-    -moz-column-gap: 3rem;
-         column-gap: 3rem;
-}
-.gap-4{
-    row-gap: 4rem;
-    -moz-column-gap: 4rem;
-         column-gap: 4rem;
-}
-.gap-5{
-    row-gap: 5rem;
-    -moz-column-gap: 5rem;
-         column-gap: 5rem;
-}
-.gap-6{
-    row-gap: 6rem;
-    -moz-column-gap: 6rem;
-         column-gap: 6rem;
-}
-.gap-7{
-    row-gap: 7rem;
-    -moz-column-gap: 7rem;
-         column-gap: 7rem;
-}
-
-.font-11 {
-    font-size: 11px;
-}
-.font-12 {
-    font-size: 12px;
-}
-.font-13 {
-    font-size: 13px;
-}
-.font-14 {
-    font-size: 14px;
-}
-.font-15 {
-    font-size: 15px;
-}
-.font-16 {
-    font-size: 16px;
-}
-.font-17 {
-    font-size: 17px;
-}
-.font-18 {
-    font-size: 18px;
-}
-.font-19 {
-    font-size: 19px;
-}
-.font-20 {
-    font-size: 20px;
-}
-.font-21 {
-    font-size: 21px;
-}
-.font-22 {
-    font-size: 22px;
-}
-.font-23 {
-    font-size: 23px;
-}
-.font-24 {
-    font-size: 24px;
-}
-.font-25 {
-    font-size: 25px;
-}
-.font-27 {
-    font-size: 27px;
-}
-.font-28 {
-    font-size: 28px;
-}
-.font-29 {
-    font-size: 29px;
-}
-.font-30 {
-    font-size: 30px;
-}
-.font-32 {
-    font-size: 32px;
-}
-.font-40 {
-    font-size: 40px;
-}
-.font-50 {
-    font-size: 50px;
-}
-.font-60 {
-    font-size: 60px;
-}
 
 main {
     display: flex;
@@ -653,6 +538,24 @@ main {
     height: 100%;
     min-height: 100vh;
 }
+
+body > header{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: -webkit-fit-content;
+    height: -moz-fit-content;
+    height: fit-content;
+    min-height: 30px;
+    width: 100%;
+    background-color: #242424;
+    padding: 0 1rem;
+}
+
+body > header a{
+    color: #d9d9d9;
+}
+
 
 .container {
     width: 100%;
@@ -853,8 +756,7 @@ h1{
 
 .input-search{
     font-size: 30px;
-    width: 540px;
-    border-radius: 5px;
+    width: 450px;
     background-color: transparent;
     color: #d9d9d9;
 }
@@ -884,7 +786,7 @@ h1{
 
 .group-filter[data-active="1"]{
     background-color: #4d4d4d;
-    height: 500px;
+    height: 450px;
     width: 300px;
     border-radius: 5px;
     display: flex;
@@ -927,6 +829,89 @@ h1{
     opacity: .5;
 }
 
+.group-filter .ul-orderby{
+    display: flex;
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+    row-gap: 0.25rem;
+    -moz-column-gap: 0.25rem;
+         column-gap: 0.25rem;
+}
+
+.group-filter .ul-orderby li input{
+    display: none;
+}
+
+.group-filter .ul-orderby li span{
+    display: flex;
+    height: 30px;
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content;
+    border-radius: 30px;
+    background-color: #cccccc73;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 10px;
+    font-size: 14px;
+    font-weight: 800;
+    color: #4d4d4d;
+    transition: .3s ease;
+}
+
+.group-filter .ul-orderby li span:hover{
+    background-color: #d9d9d9;
+}
+
+.group-filter .ul-orderby li input:checked + span{
+    background-color: #d9d9d9;
+}
+
+.reset{
+    display: flex;
+    align-items: center;
+    height: 30px;
+    width: 165px;
+    border-radius: 30px;
+    background-color: #ccc;
+    padding: 0px 10px;
+    font-size: 14px;
+    font-weight: 800;
+    color: #4d4d4d;
+    cursor: pointer;
+    transition: .3s ease;
+}
+
+.reset:hover{
+    background-color: #d9d9d9;
+}
+
+.reset svg{
+    height: 20px;
+    width: 20px;
+    display: inline-block;
+    fill: #4d4d4d;
+    margin-right: 25px;
+}
+
+.notResults {
+    display: flex;
+    justify-content: center;
+}
+
+.notResults > span{
+    color: #cccccc;
+    font-size: 22px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    padding: 1rem;
+}
+
+.notResults > span > span{
+    color: #d9d9d9;
+    font-weight: 700;
+}
+
 .carregando {
     display: flex;
     justify-content: center;
@@ -944,7 +929,7 @@ h1{
     pointer-events: none;
 }
 
-.carregando[data-carregando="1"]{
+.carregando[data-carregando="true"]{
     opacity: 1;
 }
 
