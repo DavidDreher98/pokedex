@@ -148,7 +148,7 @@
             async getPokedex() {
                 this.carregando = true;
 
-                axios.get("https://pokeapi.co/api/v2/pokemon?offset=0&limit=50").then(response => {
+                axios.get("https://pokeapi.co/api/v2/pokemon?offset=0&limit=1000").then(response => {
                     if (response && response.status == 200) {
                         this.getDetails(response.data.results);
                     }
