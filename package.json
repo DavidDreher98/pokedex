@@ -24,7 +24,9 @@
     "test": "tests"
   },
   "dependencies": {
-    "vue": "^3.2.31"
+    "chart.js": "^4.2.1",
+    "vue": "^3.2.31",
+    "vue-chartjs": "^5.2.0"
   },
   "keywords": [],
   "author": "",

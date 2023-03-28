@@ -1,5 +1,1 @@
-@media only screen and (max-width: 1410px) {
-    .container {
-        padding: 0 1rem;
-    }
-}
+@media only screen and (max-width:1410px){.container{padding:0 1rem}.modal{padding:1rem}}@media only screen and (max-width:1300px){.modal-body>div>article{max-width:none}.modal-body>div>article:first-of-type{margin-top:1rem}.modal-image-pokemon{margin:auto}.modal-image-pokemon img{width:100%}}@media only screen and (max-width:500px){.modal-body{padding:0 1rem 1rem}}

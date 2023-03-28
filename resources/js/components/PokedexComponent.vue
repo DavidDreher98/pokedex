@@ -72,7 +72,7 @@
             </div>
         </div>
         <div class="pokedex-list">
-            <a v-for="pokemon in pokedexFiltered" :key="pokemon">
+            <a v-for="pokemon in pokedexFiltered" :key="pokemon" @click="openDetails(pokemon)">
                 <aside>{{pokemon.id}}</aside>
                 <figure class="card-figure-pokedex">
                     <img :src="pokemon.image" alt="Image pokemon">
@@ -92,6 +92,7 @@
             <span>Sorry, we couldn't find any pokemon with <span>"{{ filter }}"</span></span>
         </div>
         <status-component :carregando="carregando"></status-component>
+        <modal-component :pokemon="pokemonCurrent" :active="modalActive" @closeModal="modalActive = false;"></modal-component>
     </div>
 </template>
 <script>
@@ -101,6 +102,7 @@
                 types: [],
                 pokedex: [],
                 pokedexFiltered: [],
+                pokemonCurrent: null,
                 orderBy: 0,
                 filterActive: 0,
                 filter: null,
@@ -108,6 +110,7 @@
                 timeInterval: 300,
                 intervalKey: null,
                 carregando: false,
+                modalActive: false,
             }
         },
 
@@ -122,7 +125,22 @@
             async getTypes() {
                 axios.get("https://pokeapi.co/api/v2/type").then(response => {
                     if (response && response.status == 200) {
-                        this.types = response.data.results;
+                        this.getTypesDetails(response.data.results);
+                    }
+                });
+            },
+
+            async getTypesDetails(results){
+                const typeRequests = results.map(type => {
+                    if (this.pokedex.findIndex(item => item.name.toLowerCase() == type.name) == -1)
+                        return axios.get(type.url);
+                });
+
+                const typeResponses = await Promise.all(typeRequests);
+
+                typeResponses.forEach(response => {
+                    if (response && response.status == 200) {
+                        this.types.push(response.data);
                     }
                 });
             },
@@ -151,6 +169,43 @@
                 });
 
                 this.carregando = false;
+            },
+
+            async getEvolution(pokemonName) {
+                let response = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${pokemonName}`);
+                let evolutionChainUrl = response.data.evolution_chain.url;
+                let evolutionChainResponse = await axios.get(evolutionChainUrl);
+
+                let pokemonEvolutions = [];
+                let currentEvolution = evolutionChainResponse.data.chain;
+
+                while (currentEvolution) {
+                    let pokemonName = currentEvolution.species.name;
+
+                    let pokemonId = currentEvolution.species.url;
+                    pokemonId = pokemonId.split("/");
+                    pokemonId = pokemonId[pokemonId.length - 2];
+
+                    let level = currentEvolution.evolution_details[0]?.min_level ?? null;
+
+                    console.log("currentEvolution.species.url");
+                    console.log(currentEvolution.species.url);
+                    console.log("pokemonId");
+                    console.log(pokemonId);
+
+                    pokemonEvolutions.push(
+                        { 
+                            id: pokemonId, 
+                            name: pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1), 
+                            level: level,
+                            image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`
+                        }
+                    );
+
+                    currentEvolution = currentEvolution.evolves_to[0];
+                }
+
+                return pokemonEvolutions;
             },
 
             // Filters
@@ -229,6 +284,39 @@
 
             assetPath(path) {
                 return window.location.origin + path;
+            },
+
+            // Pokemon Details
+
+            async openDetails(pokemon){
+                document.querySelector("body").style.overflow = "hidden";
+                this.modalActive = true;
+
+                if (pokemon.weaknesses == null || pokemon.advantages) {
+                    let weaknesses = [];
+                    let advantages = [];
+                    await pokemon.types.map((type) => {
+                        let details = this.types.find(i => i.name == type.type.name);
+                        if (details) {
+                            details.damage_relations.double_damage_from.forEach(item => {
+                                weaknesses.push(item.name);
+                            });
+                            details.damage_relations.double_damage_to.forEach(item => {
+                                advantages.push(item.name);
+                            });
+                        }
+                    });
+
+                    pokemon.weaknesses = [...new Set(weaknesses)];
+                    pokemon.advantages = [...new Set(advantages)];
+                }
+
+                if (pokemon.evolution == null)
+                    this.getEvolution(pokemon.name.toLowerCase()).then((response) => {
+                        pokemon.evolution = response;
+                    });
+                
+                this.pokemonCurrent = pokemon;
             },
         },
 
