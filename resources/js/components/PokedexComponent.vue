@@ -2,7 +2,7 @@
     <div>
         <div class="flex-w flex-jb flex-ac mt-2">
             <h1>Pokédex</h1>
-            <div class="flex-as mr-4">
+            <div class="box-input-search">
                 <svg width="33px" height="33px" viewBox="0 0 512.000000 512.000000">
                     <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#757575" stroke="none">
                     <path d="M2085 4376 c-701 -115 -1239 -656 -1341 -1348 -22 -151 -15 -420 15 -560 186 -862 1011 -1408 1881 -1242 232 44 470 154 676 315 l61 47 414 -415 c228 -228 426 -421 441 -429 99 -52 196 45 144 144 -8 15 -201 213 -429 441 l-415 414 47 61 c299 384 409 853 311 1322 -128 615 -615 1100 -1239 1235 -123 27 -444 35 -566 15z m527 -226 c175 -37 325 -100 474 -198 311 -207 520 -514 600 -882 22 -101 30 -342 15 -453 -84 -627 -571 -1114 -1198 -1198 -111 -15 -352 -7 -453 15 -549 119 -964 533 -1082 1079 -29 136 -32 407 -5 540 113 560 551 997 1102 1101 126 24 131 25 295 21 107 -3 185 -10 252 -25z"/> </g>
@@ -75,7 +75,7 @@
             <a v-for="pokemon in pokedexFiltered" :key="pokemon" @click="openDetails(pokemon)">
                 <aside>{{pokemon.id}}</aside>
                 <figure class="card-figure-pokedex">
-                    <img :src="pokemon.image" alt="Image pokemon">
+                    <image-component :src="pokemon.image" :alt="pokemon.name"></image-component>
                 </figure>
                 <div>
                     <span>{{pokemon.id}} &bull; {{pokemon.name}}</span>
@@ -92,7 +92,7 @@
             <span>Sorry, we couldn't find any pokemon with <span>"{{ filter }}"</span></span>
         </div>
         <status-component :carregando="carregando"></status-component>
-        <modal-component :pokemon="pokemonCurrent" :active="modalActive" @closeModal="modalActive = false;"></modal-component>
+        <modal-component :pokemon="pokemonCurrent" :active="modalActive" @closeModal="modalActive = false;" @getByIdPokemon="getByIdPokemon"></modal-component>
     </div>
 </template>
 <script>
@@ -127,13 +127,21 @@
                     if (response && response.status == 200) {
                         this.getTypesDetails(response.data.results);
                     }
+                }).catch(response => {
+                    console.log("Error in: getTypes");
+                    console.log(response);
+                    return;
                 });
             },
 
             async getTypesDetails(results){
                 const typeRequests = results.map(type => {
                     if (this.pokedex.findIndex(item => item.name.toLowerCase() == type.name) == -1)
-                        return axios.get(type.url);
+                        return axios.get(type.url).catch(response => {
+                            console.log("Error in: getTypesDetails");
+                            console.log(response);
+                            return;
+                        });
                 });
 
                 const typeResponses = await Promise.all(typeRequests);
@@ -152,13 +160,21 @@
                     if (response && response.status == 200) {
                         this.getDetails(response.data.results);
                     }
+                }).catch(response => {
+                    console.log("Error in: getPokedex");
+                    console.log(response);
+                    return;
                 });
             },
 
             async getDetails(results) {
                 const pokemonRequests = results.map(pokemon => {
                     if (this.pokedex.findIndex(item => item.name.toLowerCase() == pokemon.name) == -1)
-                        return axios.get(pokemon.url);
+                        return axios.get(pokemon.url).catch(response => {
+                            console.log("Error in: getDetails");
+                            console.log(response);
+                            return;
+                        });
                 });
 
                 const pokemonResponses = await Promise.all(pokemonRequests);
@@ -187,11 +203,6 @@
                     pokemonId = pokemonId[pokemonId.length - 2];
 
                     let level = currentEvolution.evolution_details[0]?.min_level ?? null;
-
-                    console.log("currentEvolution.species.url");
-                    console.log(currentEvolution.species.url);
-                    console.log("pokemonId");
-                    console.log(pokemonId);
 
                     pokemonEvolutions.push(
                         { 
@@ -287,6 +298,12 @@
             },
 
             // Pokemon Details
+
+            async getByIdPokemon(id){
+                let pokemon = this.pokedex.find(c => c.id == id);
+                if(pokemon)
+                    this.openDetails(pokemon);
+            },
 
             async openDetails(pokemon){
                 document.querySelector("body").style.overflow = "hidden";

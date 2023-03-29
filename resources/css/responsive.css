@@ -26,6 +26,40 @@
     }
 }
 
+@media only screen and (max-width: 900px) {
+    .modal-body {
+        margin-bottom: 2rem;
+    }
+}
+
+@media only screen and (max-width: 800px) {
+    .box-input-search {
+        margin-right: 0rem;
+    }
+}
+
+@media only screen and (max-width: 680px) {
+    .box-input-search {
+        order: 1;
+        margin-top: .5rem;
+        width: 100%;
+    }
+
+    .input-search {
+        width: 100%;
+    }
+
+    .footer-contatos{
+        margin-bottom: 2rem;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    .input-search {
+        font-size: 20px;
+    }
+}
+
 @media only screen and (max-width: 500px) {
     .modal-body {
         padding: 0 1rem 1rem 1rem;

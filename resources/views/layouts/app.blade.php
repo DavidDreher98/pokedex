@@ -5,7 +5,41 @@
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <link rel="shortcut icon" href="{{ asset('img/favicon.png') }}" type="image/x-icon"> 
+        <link rel="shortcut icon" href="{{ asset('img/favicon.png') }}" type="image/x-icon">    
+
+        <meta name="mobile-web-app-capable" content="yes">  
+        <meta name="apple-mobile-web-app-capable" content="yes">  
+        <meta name="theme-color" content="#383738">
+        <meta name="msapplication-TileColor" content="#383738">
+        <meta name="msapplication-navbutton-color" content="#383738">
+        <meta name="apple-mobile-web-app-status-bar-style" content="#383738">
+        <meta name="robots" content="index, follow"/>
+        
+        <meta itemprop="name" content="Pokédex - David Dreher Developer"/>
+
+        <meta itemprop="description" content="Explore meu portfólio e descubra como posso ajudá-lo a alcançar seus objetivos digitais, desde websites elegantes até soluções personalizadas. Vamos começar juntos!">
+
+        <meta itemprop="image" content="{{ asset('img/favicon.png') }}"/>
+        <meta itemprop="url" content="{{ request()->fullUrl() }}"/>
+        
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="Pokédex - David Dreher Developer"/>
+        <meta property="og:description" content="Explore meu portfólio e descubra como posso ajudá-lo a alcançar seus objetivos digitais, desde websites elegantes até soluções personalizadas. Vamos começar juntos!" />
+        <meta property="og:image:width" content="300">
+        <meta property="og:image" content="{{ asset('img/favicon.png') }}" />
+        <meta property="og:url" content="{{ request()->fullUrl() }}" />
+        <meta property="og:site_name" content="Pokédex - David Dreher Developer" />
+        <meta property="og:locale" content="{{ app()->getLocale() }}" />    
+        <meta property="article:author" content="https://www.facebook.com/daviddreher.dev" />
+        <meta property="article:publisher" content="https://www.facebook.com/daviddreher.dev" />    
+        
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:domain" content="{{ request()->getHost() }}" />   
+        <meta property="twitter:title" content="Pokédex - David Dreher Developer"/>
+        <meta property="twitter:description" content="Explore meu portfólio e descubra como posso ajudá-lo a alcançar seus objetivos digitais, desde websites elegantes até soluções personalizadas. Vamos começar juntos!">
+        <meta property="twitter:image" content="{{ asset('img/favicon.png') }}" />
+        <meta property="twitter:url" content="{{ request()->fullUrl() }}" />    
+
         <title>@yield('tituloPagina')</title>
         @include('includes.head')
     </head>

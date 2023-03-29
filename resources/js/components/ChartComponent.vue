@@ -33,7 +33,7 @@
                 chartOptions: {
                     plugins: {
                         legend: {
-                        display: false
+                            display: false
                         }
                     },
                     responsive: true,

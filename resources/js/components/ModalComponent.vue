@@ -49,11 +49,11 @@
                 <section v-if="pokemon.evolution && pokemon.evolution.length > 0" class="pokemon-evolution">
                     <h1>Evolutions</h1>
                     <article>
-                        <a v-for="pokemonEv in pokemon.evolution" :key="pokemonEv" @click="openDetails(pokemonEv)">
+                        <a v-for="pokemonEv in pokemon.evolution" :key="pokemonEv" @click="getByIdPokemon(pokemonEv.id)">
                             <figure>
                                 <img :src="pokemonEv.image" alt="Image pokemonEv">
                                 <small v-if="pokemonEv.level">{{ pokemonEv.level }} lvUP</small>
-                                <small v-else>Begin</small>
+                                <small v-else></small>
                             </figure>
                             <div class="mt-05">
                                 <span>{{ pokemonEv.id }} &bull; {{ pokemonEv.name }}</span>
@@ -61,9 +61,12 @@
                         </a>
                     </article>
                 </section>
-                
+                <status-component carregando="true" v-else></status-component>
             </div>
-
+            <footer v-if="pokemon">
+                <button type="type" v-show="idPrev > 0" class="button-prev" @click="getByIdPokemon(idPrev)">Prev</button>
+                <button type="type" v-show="idNext < 1000" class="button-next" @click="getByIdPokemon(idNext)">Next</button>
+            </footer>
         </section>
     </aside>
 </template>
@@ -84,7 +87,9 @@ import ChartComponent from './ChartComponent.vue';
                 chart:{
                     labels: [],
                     values: []
-                }
+                },
+                idPrev: 0,
+                idNext: 0,
             }
         },
 
@@ -92,6 +97,10 @@ import ChartComponent from './ChartComponent.vue';
             closeModal(){
                 this.$emit("closeModal");
                 document.querySelector("body").style.overflow = "auto";
+            },
+
+            getByIdPokemon(id) {
+                this.$emit("getByIdPokemon", id);
             },
 
             // Others
@@ -105,6 +114,9 @@ import ChartComponent from './ChartComponent.vue';
 
         watch: {
             pokemon: function(){
+                this.idPrev = this.pokemon.id - 1;
+                this.idNext = this.pokemon.id + 1;
+
                 this.chart.labels = [];
                 this.chart.values = [];
 
